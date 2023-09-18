@@ -18,7 +18,7 @@ enum { DIFFTEST_TO_DUT, DIFFTEST_TO_REF };
 #ifndef DIFFTEST_LOG_FILE
 #define DIFFTEST_LOG_FILE nullptr
 #endif
-
+/***************DON'T CHANGE ORDER****************************/
 typedef struct {
   uint64_t gpr[32];
 #ifdef CONFIG_DIFF_FPU
@@ -43,6 +43,31 @@ typedef struct {
   uint64_t mideleg;
   uint64_t medeleg;
   uint64_t pc;
+#ifdef CONFIG_DIFF_RVH
+  uint64_t v; // virtualization mode
+  uint64_t mtval2, mtinst, hstatus, hideleg, hedeleg;
+  uint64_t hcounteren, htval, htinst, hgatp, vsstatus;
+  uint64_t vstvec, vsepc, vscause, vstval, vsatp, vsscratch;
+#endif
+#ifdef CONFIG_DIFF_RVV
+  #define VLEN 128
+  #define VENUM64 (VLEN/64)
+  #define VENUM32 (VLEN/32)
+  #define VENUM16 (VLEN/16)
+  #define VENUM8  (VLEN/8)
+    //vector
+  union {
+    uint64_t _64[VENUM64];
+    uint32_t _32[VENUM32];
+    uint16_t _16[VENUM16];
+    uint8_t  _8[VENUM8];
+  } vr[32];
+
+  uint64_t vstart;
+  uint64_t vxsat, vxrm, vcsr;
+  uint64_t vl, vtype, vlenb;
+#endif
+
 #ifdef CONFIG_DIFF_DEBUG_MODE
   uint64_t debugMode;
   uint64_t dcsr;
@@ -50,6 +75,8 @@ typedef struct {
   uint64_t dscratch0;
   uint64_t dscratch1;
 #endif // CONFIG_DIFF_DEBUG_MODE
+
+
 } diff_context_t;
 
 class DifftestRefConfig {

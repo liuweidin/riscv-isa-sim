@@ -94,38 +94,44 @@ void DifftestRef::get_regs(diff_context_t *ctx) {
   ctx->dscratch0 = state->csrmap[CSR_DSCRATCH0]->read();
   ctx->dscratch1 = state->csrmap[CSR_DSCRATCH1]->read();
 #endif // DIFF_DEBUG_MODE
-#ifdef CONFIG_DIFF_RVH
-  ctx->v          = (uint64_t)state->v; // virtualization mode
-  ctx->mtval2     = state->mtval2->read();
-  ctx->mtinst     = state->mtinst->read();
-  ctx->hstatus    = state->hstatus->read();
-  ctx->hideleg    = state->hideleg->read();
-  ctx->hedeleg    = state->hedeleg->read();
-  ctx->hcounteren = state->hcounteren->read();
-  ctx->htval      = state->htval->read();
-  ctx->htinst     = state->htinst->read();
-  ctx->hgatp      = state->hgatp->read();
-  ctx->vsstatus   = state->vsstatus->read();
-  ctx->vstvec     = state->vstvec->read();
-  ctx->vsepc      = state->vsepc->read();
-  ctx->vscause    = state->vscause->read();
-  ctx->vstval     = state->vstval->read();
-  ctx->vsatp      = state->vstval->read();
-  // ctx->vsscratch  = state->vsscratch->read(); // TODO: state_t don't have this reg
-#endif
+// #ifdef CONFIG_DIFF_RVH // TODO:
+//   ctx->v          = (uint64_t)state->v; // virtualization mode
+//   ctx->mtval2     = state->mtval2->read();
+//   ctx->mtinst     = state->mtinst->read();
+//   ctx->hstatus    = state->hstatus->read();
+//   ctx->hideleg    = state->hideleg->read();
+//   ctx->hedeleg    = state->hedeleg->read();
+//   ctx->hcounteren = state->hcounteren->read();
+//   ctx->htval      = state->htval->read();
+//   ctx->htinst     = state->htinst->read();
+//   ctx->hgatp      = state->hgatp->read();
+//   ctx->vsstatus   = state->vsstatus->read();
+//   ctx->vstvec     = state->vstvec->read();
+//   ctx->vsepc      = state->vsepc->read();
+//   ctx->vscause    = state->vscause->read();
+//   ctx->vstval     = state->vstval->read();
+//   ctx->vsatp      = state->vstval->read();
+//   // ctx->vsscratch  = state->vsscratch->read(); // TODO: state_t don't have this reg
+// #endif
 #ifdef CONFIG_DIFF_RVV
-    //vector
+  /*******************************ONLY FOR VLEN=128,ELEN=64*******************************************/
+  for(int i=0;i < NVPR; i++){
+    auto vReg_Val0 = p->VU.elt<uint64_t>(i, 0,false);
+    auto vReg_Val1 = p->VU.elt<uint64_t>(i, 1,false);
+    ctx->vr[i]._64[0] = vReg_Val0;
+    ctx->vr[i]._64[1] = vReg_Val1;
+    //printf("%016lx_%016lx  %016lx_%016lx\n",vReg_Val1,vReg_Val0,ctx->vr[i]._64[1],ctx->vr[i]._64[0]);
+  }
+  /***************************************************************************************************/
+  auto& vstate = p->VU;
 
-  // for(int i=0;i < NVPR;i++){
-  //   ctx->vr[i]    = state->VPR[i]; // TODO: difftest vector reg
-  // }
-  ctx->vstart     = state->csrmap[CSR_VSTART]->read();
-  ctx->vxsat      = state->csrmap[CSR_VXSAT]->read();
-  ctx->vxrm       = state->csrmap[CSR_VXRM]->read();
-  ctx->vcsr       = state->csrmap[CSR_VCSR]->read();
-  ctx->vl         = state->csrmap[CSR_VL]->read();
-  ctx->vtype      = state->csrmap[CSR_VTYPE]->read();
-  ctx->vlenb      = state->csrmap[CSR_VLENB]->read();
+  ctx->vstart     = vstate.vstart->read();
+  ctx->vxsat      = vstate.vxsat->read();
+  ctx->vxrm       = vstate.vxrm->read();
+  ctx->vcsr       = 0;
+  ctx->vl         = vstate.vl->read();
+  ctx->vtype      = vstate.vtype->read();
+  ctx->vlenb      = vstate.vlenb;
 #endif
 }
 
@@ -216,7 +222,7 @@ void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
     state->csrmap[CSR_DSCRATCH1]->write(ctx->dscratch1);
   }
 #endif // DIFF_DEBUG_MODE
-/**********TODO: NEED MOVE************/
+//TODO:
 // #ifdef CONFIG_DIFF_RVH
 //   if (!on_demand || state->v != ctx->v) {
 //     state->v = ctx->v;
@@ -268,39 +274,54 @@ void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
 //   }
 //   // if (!on_demand || state->vsscratch->read() !=ctx->vsscratch) {
 //   //   state->vsscratch->write(ctx->vsscratch);
-//   // } // TODO: state_t don't have this reg
+//   // } 
 // #endif
 #ifdef CONFIG_DIFF_RVV
-  // for (int i = 0; i < NVPR; i++) {
-  //   if (!on_demand || state->VPR[i] != ctx->vr[i]) {
-  //     state->VPR.write(i, ctx->vr[i]);
-  //   }
-  // } //TODO: difftest vector reg
-  if (!on_demand || state->csrmap[CSR_VSTART]->read() !=ctx->vstart) {
-    state->csrmap[CSR_VSTART]->write(ctx->vstart);
-    //printf("%lx %lx\n",state->vstart->read(),ctx->vstart);
+  /**********************ONLY FOR VLEN=128,ELEN=64************************************/
+  for (int i = 0; i < NVPR; i++) {
+    auto &vReg_Val0 = p->VU.elt<uint64_t>(i, 0, true);
+    auto &vReg_Val1 = p->VU.elt<uint64_t>(i, 1, true);
+    if (!on_demand || vReg_Val0 != ctx->vr[i]._64[0]) {
+      vReg_Val0 = ctx->vr[i]._64[0];
+    }
+    if(!on_demand || vReg_Val1 != ctx->vr[i]._64[1]){
+      vReg_Val1 = ctx->vr[i]._64[1];
+    }
+  } 
+  auto& vstate = p->VU;
+  /**********************************************************************************/
+  printf("here 2\n");
+  if (!on_demand || vstate.vstart->read() !=ctx->vstart) {
+    printf("sdaf\n");
+    p->VU.vstart->write(ctx->vstart);
+    printf("sdaf2\n");
   }
-  if (!on_demand || state->csrmap[CSR_VXSAT]->read() !=ctx->vxsat) {
-    state->csrmap[CSR_VXSAT]->write(ctx->vxsat);
+  printf("here 3\n");
+  if (!on_demand || vstate.vxsat->read() !=ctx->vxsat) {
+    vstate.vxsat->write(ctx->vxsat);
   }
-  if (!on_demand || state->csrmap[CSR_VXRM]->read() !=ctx->vxrm) {
-    state->csrmap[CSR_VXRM]->write(ctx->vxrm);
+  printf("here 4\n");
+  if (!on_demand || vstate.vxrm->read() !=ctx->vxrm) {
+    vstate.vxrm->write(ctx->vxrm);
   }
-  if (!on_demand || state->csrmap[CSR_VCSR]->read() !=ctx->vcsr) {
-    state->csrmap[CSR_VCSR]->write(ctx->vcsr);
+  printf("here 5\n");
+  // if (!on_demand || state->csrmap[CSR_VCSR]->read() !=ctx->vcsr) {
+  //   csrmap[CSR_VCSR]->write(ctx->vcsr);
+  // }
+  printf("here 6\n");
+  if (!on_demand || vstate.vl->read() !=ctx->vl) {
+    vstate.vl->write(ctx->vl);
   }
-  if (!on_demand || state->csrmap[CSR_VL]->read() !=ctx->vl) {
-    state->csrmap[CSR_VL]->write(ctx->vl);
+  printf("here 7\n");
+  if (!on_demand || vstate.vtype->read() !=ctx->vtype) {
+    vstate.vtype->write(ctx->vtype);
   }
-  if (!on_demand || state->csrmap[CSR_VTYPE]->read() !=ctx->vtype) {
-    state->csrmap[CSR_VTYPE]->write(ctx->vtype);
-  }
-  if (!on_demand || state->csrmap[CSR_VLENB]->read() !=ctx->vlenb) {
-    state->csrmap[CSR_VLENB]->write(ctx->vlenb);
-  }
+  printf("here 8\n");
+  // if (!on_demand || vstate.vlenb->read() !=ctx->vlenb) {
+  //   vstate.vlenb = ctx->vlenb;
+  // }
   
 #endif
-
 }
 
 void DifftestRef::memcpy_from_dut(reg_t dest, void* src, size_t n) {

@@ -109,22 +109,14 @@ struct state_t
   csr_t_p stvec;
   virtualized_csr_t_p satp;
   csr_t_p scause;
-  // RISCV-V
-  /**************TODO: vector regfile********************/ 
-  //   union {
-  //   uint64_t _64[VENUM64];
-  //   uint32_t _32[VENUM32];
-  //   uint16_t _16[VENUM16];
-  //   uint8_t  _8[VENUM8];
-  // } vr[32];
-  // regfile_t<reg_t, NXPR, true> VPR;
-  vector_csr_t_p vstart;
-  vector_csr_t_p vxsat;
-  vector_csr_t_p vxrm;
-  // composite_csr_t vcsr;//TODO
-  vector_csr_t_p vl;
-  vector_csr_t_p vtype;
-  // vector_csr_t_p vlenb;//TODO
+  // // RISCV-V
+  // vector_csr_t_p vstart;
+  // csr_t_p vxsat;
+  // vector_csr_t_p vxrm;
+  // composite_csr_t_p vcsr;
+  // vector_csr_t_p vl;
+  // vector_csr_t_p vtype;
+  // vector_csr_t_p vlenb;
 
   // When taking a trap into HS-mode, we must access the nonvirtualized HS-mode CSRs directly:
   csr_t_p nonvirtual_stvec;

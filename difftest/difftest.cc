@@ -128,7 +128,7 @@ void DifftestRef::get_regs(diff_context_t *ctx) {
   ctx->vstart     = vstate.vstart->read();
   ctx->vxsat      = vstate.vxsat->read();
   ctx->vxrm       = vstate.vxrm->read();
-  ctx->vcsr       = 0;
+  ctx->vcsr       = state->csrmap[CSR_VCSR]->read();
   ctx->vl         = vstate.vl->read();
   ctx->vtype      = vstate.vtype->read();
   ctx->vlenb      = vstate.vlenb;
@@ -276,7 +276,12 @@ void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
 //   //   state->vsscratch->write(ctx->vsscratch);
 //   // } 
 // #endif
+
 #ifdef CONFIG_DIFF_RVV
+#define SSTATUS_WMASK ((1 << 19) | (1 << 18) | (0x3 << 13) | (0x3 << 9) | (1 << 8) | (1 << 5) | (1 << 1))
+#define SSTATUS_RMASK (SSTATUS_WMASK | (0x3 << 15) | (1ull << 63) | (3ull << 32))
+state->vsstatus->write(ctx->mstatus & SSTATUS_RMASK);
+  auto& vstate = p->VU;
   /**********************ONLY FOR VLEN=128,ELEN=64************************************/
   for (int i = 0; i < NVPR; i++) {
     auto &vReg_Val0 = p->VU.elt<uint64_t>(i, 0, true);
@@ -288,39 +293,30 @@ void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
       vReg_Val1 = ctx->vr[i]._64[1];
     }
   } 
-  auto& vstate = p->VU;
-  /**********************************************************************************/
-  printf("here 2\n");
+  /************************************************  **********************************/
   if (!on_demand || vstate.vstart->read() !=ctx->vstart) {
-    printf("sdaf\n");
-    p->VU.vstart->write(ctx->vstart);
-    printf("sdaf2\n");
+    vstate.vstart->write_raw(ctx->vstart);
   }
-  printf("here 3\n");
+  /**********************NEED TO ADD WRITE*********************************************/
   if (!on_demand || vstate.vxsat->read() !=ctx->vxsat) {
-    vstate.vxsat->write(ctx->vxsat);
+    // vstate.vxsat->write(ctx->vxsat);
   }
-  printf("here 4\n");
   if (!on_demand || vstate.vxrm->read() !=ctx->vxrm) {
-    vstate.vxrm->write(ctx->vxrm);
+    vstate.vxrm->write_raw(ctx->vxrm);
   }
-  printf("here 5\n");
+  /******************************Don't need write vcsr**********************************/
   // if (!on_demand || state->csrmap[CSR_VCSR]->read() !=ctx->vcsr) {
   //   csrmap[CSR_VCSR]->write(ctx->vcsr);
   // }
-  printf("here 6\n");
   if (!on_demand || vstate.vl->read() !=ctx->vl) {
-    vstate.vl->write(ctx->vl);
+    vstate.vl->write_raw(ctx->vl);
   }
-  printf("here 7\n");
   if (!on_demand || vstate.vtype->read() !=ctx->vtype) {
-    vstate.vtype->write(ctx->vtype);
+    vstate.vtype->write_raw(ctx->vtype);
   }
-  printf("here 8\n");
-  // if (!on_demand || vstate.vlenb->read() !=ctx->vlenb) {
-  //   vstate.vlenb = ctx->vlenb;
-  // }
-  
+  if (!on_demand || vstate.vlenb !=ctx->vlenb) {
+    vstate.vlenb = ctx->vlenb;
+  }
 #endif
 }
 

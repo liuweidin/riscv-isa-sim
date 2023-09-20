@@ -109,14 +109,6 @@ struct state_t
   csr_t_p stvec;
   virtualized_csr_t_p satp;
   csr_t_p scause;
-  // // RISCV-V
-  // vector_csr_t_p vstart;
-  // csr_t_p vxsat;
-  // vector_csr_t_p vxrm;
-  // composite_csr_t_p vcsr;
-  // vector_csr_t_p vl;
-  // vector_csr_t_p vtype;
-  // vector_csr_t_p vlenb;
 
   // When taking a trap into HS-mode, we must access the nonvirtualized HS-mode CSRs directly:
   csr_t_p nonvirtual_stvec;

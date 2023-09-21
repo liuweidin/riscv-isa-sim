@@ -240,7 +240,7 @@ void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
   if (!on_demand || vstate.vlenb != ctx->vlenb) {
     vstate.vlenb = ctx->vlenb;
   }
-#endif
+#endif // CONFIG_DIFF_RVV
 }
 
 void DifftestRef::memcpy_from_dut(reg_t dest, void* src, size_t n) {

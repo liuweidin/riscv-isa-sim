@@ -29,7 +29,7 @@
     #define CONFIG_DIFF_ISA_STRING "RV64IMAFDCV_zba_zbb_zbc_zbs_zbkb_zbkc_zbkx_zknd_zkne_zknh_zksed_zksh_svinval"
     #else
     #define CONFIG_DIFF_ISA_STRING "RV64IMAFDC_zba_zbb_zbc_zbs_zbkb_zbkc_zbkx_zknd_zkne_zknh_zksed_zksh_svinval"
-    #endif //CONFIG_DIFF_RVV
+    #endif // CONFIG_DIFF_RVV
 #define CONFIG_MEMORY_SIZE     (16 * 1024 * 1024 * 1024UL)
 #define CONFIG_FLASH_BASE      0x10000000UL
 #define CONFIG_FLASH_SIZE      0x100000UL

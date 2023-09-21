@@ -41,6 +41,7 @@ reg_t vectorUnit_t::vectorUnit_t::set_vl(int rd, int rs1, reg_t reqVL, reg_t new
     vill = !(vflmul >= 0.125 && vflmul <= 8)
            || vsew > std::min(vflmul, 1.0f) * ELEN
            || (newType >> 8) != 0;
+    
     if (vill) {
       vlmax = 0;
       vtype->write_raw(UINT64_MAX << (p->get_xlen() - 1));

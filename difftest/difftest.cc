@@ -96,9 +96,9 @@ void DifftestRef::get_regs(diff_context_t *ctx) {
 #endif // DIFF_DEBUG_MODE
 
 #ifdef CONFIG_DIFF_RVV
-auto& vstate = p->VU;
+  auto& vstate = p->VU;
   /*******************************ONLY FOR VLEN=128,ELEN=64*******************************************/
-  for(int i=0;i < NVPR; i++){
+  for(int i = 0; i < NVPR; i++){
     auto vReg_Val0 = vstate.elt<uint64_t>(i, 0,false);
     auto vReg_Val1 = vstate.elt<uint64_t>(i, 1,false);
     ctx->vr[i]._64[0] = vReg_Val0;
@@ -112,7 +112,7 @@ auto& vstate = p->VU;
   ctx->vl         = vstate.vl->read();
   ctx->vtype      = vstate.vtype->read();
   ctx->vlenb      = vstate.vlenb;
-#endif
+#endif // CONFIG_DIFF_RVV
 }
 
 void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
@@ -217,27 +217,27 @@ void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
     }
   } 
   /***********************************************************************************/
-  if (!on_demand || vstate.vstart->read() !=ctx->vstart) {
+  if (!on_demand || vstate.vstart->read() != ctx->vstart) {
     vstate.vstart->write_raw(ctx->vstart);
   }
   /**********************NEED TO ADD WRITE*********************************************/
-  if (!on_demand || vstate.vxsat->read() !=ctx->vxsat) {
+  if (!on_demand || vstate.vxsat->read() != ctx->vxsat) {
     // vstate.vxsat->write(ctx->vxsat);
   }
-  if (!on_demand || vstate.vxrm->read() !=ctx->vxrm) {
+  if (!on_demand || vstate.vxrm->read() != ctx->vxrm) {
     vstate.vxrm->write_raw(ctx->vxrm);
   }
   /******************************Don't need write vcsr**********************************/
   // if (!on_demand || state->csrmap[CSR_VCSR]->read() !=ctx->vcsr) {
   //   csrmap[CSR_VCSR]->write(ctx->vcsr);
   // }
-  if (!on_demand || vstate.vl->read() !=ctx->vl) {
+  if (!on_demand || vstate.vl->read() != ctx->vl) {
     vstate.vl->write_raw(ctx->vl);
   }
-  if (!on_demand || vstate.vtype->read() !=ctx->vtype) {
+  if (!on_demand || vstate.vtype->read() != ctx->vtype) {
     vstate.vtype->write_raw(ctx->vtype);
   }
-  if (!on_demand || vstate.vlenb !=ctx->vlenb) {
+  if (!on_demand || vstate.vlenb != ctx->vlenb) {
     vstate.vlenb = ctx->vlenb;
   }
 #endif

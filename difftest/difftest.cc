@@ -114,17 +114,15 @@ void DifftestRef::get_regs(diff_context_t *ctx) {
 //   // ctx->vsscratch  = state->vsscratch->read(); // TODO: state_t don't have this reg
 // #endif
 #ifdef CONFIG_DIFF_RVV
+auto& vstate = p->VU;
   /*******************************ONLY FOR VLEN=128,ELEN=64*******************************************/
   for(int i=0;i < NVPR; i++){
-    auto vReg_Val0 = p->VU.elt<uint64_t>(i, 0,false);
-    auto vReg_Val1 = p->VU.elt<uint64_t>(i, 1,false);
+    auto vReg_Val0 = vstate.elt<uint64_t>(i, 0,false);
+    auto vReg_Val1 = vstate.elt<uint64_t>(i, 1,false);
     ctx->vr[i]._64[0] = vReg_Val0;
     ctx->vr[i]._64[1] = vReg_Val1;
-    //printf("%016lx_%016lx  %016lx_%016lx\n",vReg_Val1,vReg_Val0,ctx->vr[i]._64[1],ctx->vr[i]._64[0]);
   }
   /***************************************************************************************************/
-  auto& vstate = p->VU;
-
   ctx->vstart     = vstate.vstart->read();
   ctx->vxsat      = vstate.vxsat->read();
   ctx->vxrm       = vstate.vxrm->read();
@@ -278,9 +276,6 @@ void DifftestRef::set_regs(diff_context_t *ctx, bool on_demand) {
 // #endif
 
 #ifdef CONFIG_DIFF_RVV
-#define SSTATUS_WMASK ((1 << 19) | (1 << 18) | (0x3 << 13) | (0x3 << 9) | (1 << 8) | (1 << 5) | (1 << 1))
-#define SSTATUS_RMASK (SSTATUS_WMASK | (0x3 << 15) | (1ull << 63) | (3ull << 32))
-state->vsstatus->write(ctx->mstatus & SSTATUS_RMASK);
   auto& vstate = p->VU;
   /**********************ONLY FOR VLEN=128,ELEN=64************************************/
   for (int i = 0; i < NVPR; i++) {
@@ -293,7 +288,7 @@ state->vsstatus->write(ctx->mstatus & SSTATUS_RMASK);
       vReg_Val1 = ctx->vr[i]._64[1];
     }
   } 
-  /************************************************  **********************************/
+  /***********************************************************************************/
   if (!on_demand || vstate.vstart->read() !=ctx->vstart) {
     vstate.vstart->write_raw(ctx->vstart);
   }

@@ -631,7 +631,6 @@ void sstatus_csr_t::dirty(const reg_t dirties) {
 }
 
 bool sstatus_csr_t::enabled(const reg_t which) {
-  printf("%d  %d  %d %d\n",state->v,(orig_sstatus->read() & which),(virt_sstatus->read() & which),orig_sstatus->field_exists(which));
   if ((orig_sstatus->read() & which) != 0) {
     if (!state->v || (virt_sstatus->read() & which) != 0)
       return true;

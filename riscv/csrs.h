@@ -731,7 +731,6 @@ class composite_csr_t: public csr_t {
   csr_t_p lower_csr;
   const unsigned upper_lsb;
 };
-typedef std::shared_ptr<composite_csr_t> composite_csr_t_p;
 
 class seed_csr_t: public csr_t {
  public:

@@ -18,6 +18,7 @@ enum { DIFFTEST_TO_DUT, DIFFTEST_TO_REF };
 #ifndef DIFFTEST_LOG_FILE
 #define DIFFTEST_LOG_FILE nullptr
 #endif
+
 /***************DON'T CHANGE ORDER****************************/
 typedef struct {
   uint64_t gpr[32];

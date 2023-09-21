@@ -70,8 +70,6 @@ typedef struct {
   uint64_t dscratch0;
   uint64_t dscratch1;
 #endif // CONFIG_DIFF_DEBUG_MODE
-
-
 } diff_context_t;
 
 class DifftestRefConfig {

@@ -15,8 +15,7 @@
 
 #if defined(CPU_XIANGSHAN)
 #define CONFIG_DIFF_DEBUG_MODE
-// #define CONFIG_DIFF_RVH // TODO:
-#define CONFIG_DIFF_RVV
+// #define CONFIG_DIFF_RVV  // Default off
 #endif
 
 #if defined(CPU_NUTSHELL)

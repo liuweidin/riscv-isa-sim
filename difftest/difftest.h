@@ -43,12 +43,6 @@ typedef struct {
   uint64_t mideleg;
   uint64_t medeleg;
   uint64_t pc;
-#ifdef CONFIG_DIFF_RVH
-  uint64_t v; // virtualization mode
-  uint64_t mtval2, mtinst, hstatus, hideleg, hedeleg;
-  uint64_t hcounteren, htval, htinst, hgatp, vsstatus;
-  uint64_t vstvec, vsepc, vscause, vstval, vsatp, vsscratch;
-#endif
 #ifdef CONFIG_DIFF_RVV
   #define VLEN 128
   #define VENUM64 (VLEN/64)

@@ -332,6 +332,13 @@ void DifftestRef::display() {
     if (i % 2 == 1) printf("\n");
     else printf(" | ");
   }
+  #ifdef CONFIG_DIFF_RVV
+  for(int i = 0; i < NVPR; i++){
+    auto &vReg_Val0 = p->VU.elt<uint64_t>(i, 0, true);
+    auto &vReg_Val1 = p->VU.elt<uint64_t>(i, 1, true);
+    printf("v%d_high: " FMT_WORD " v%d_low: " FMT_WORD " \n",i ,vReg_Val1 ,i,vReg_Val0);
+  }
+  #endif
   fflush(stdout);
 }
 
